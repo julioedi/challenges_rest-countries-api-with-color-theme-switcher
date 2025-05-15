@@ -1,31 +1,48 @@
 @use "vars" as *;
 @use "colors" as *;
 
-:root {
-    --body: #FFFFFF;
-    --bodyCard: #F5F5F5;
-    --text: #121212;
-    --textHalf: #828282;
-}
-
 body.dark_theme {
-    --body: #212E37;
-    --bodyCard: #2B3743;
-    --text: #FFFFFF;
-    --textHalf: #DCE5EC;
-}
+    #root>header {
+        svg {
+            .filled {
+                fill: currentColor
+            }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: "Nunito Sans", sans-serif;
-    font-optical-sizing: auto;
-    color: $text;
-    background: $body;
+            .second {
+                stroke: transparent;
+            }
+        }
+    }
 }
 
 #root {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
+    &>header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+        height: 80px;
+        background-color: $bodyCard;
+        box-shadow: 0 -36px 36px 36px rgba(0, 0, 0, 0.12);
+        transition: $transition;
+
+        .theme_toggle {
+            @include user-select-none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            gap: 1.5rem;
+
+            svg path {
+                transition: $transition;
+            }
+
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+    }
 }

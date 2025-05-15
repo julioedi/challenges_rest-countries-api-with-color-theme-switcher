@@ -1,4 +1,4 @@
-import React,{ComponentClass, FunctionComponent, JSXElementConstructor, ReactNode,PropsWithChildren } from "react";
+import React,{ComponentClass, FunctionComponent, JSXElementConstructor, ReactNode,PropsWithChildren, Component, ComponentType } from "react";
 import {
   Params,
   useLocation,
@@ -9,7 +9,7 @@ import { Location, NavigateFunction } from "react-router-dom";
 import { ParsedParams, searchParams } from "@root/utilities/querySearch";
 
 export type routeParams = Readonly<Params<string>>;
-export declare interface withRouterProps extends ComponentClass{
+export declare interface withRouterProps{
   location:Location,
   navigate: NavigateFunction,
   params: routeParams

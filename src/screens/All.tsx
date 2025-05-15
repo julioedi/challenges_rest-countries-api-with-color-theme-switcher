@@ -1,6 +1,9 @@
 import React,{Component, ComponentType} from "react";
 import {withRouter,withRouterProps} from "@root/utilities/withRouter";
 
+interface ScreenProps extends withRouterProps{
+    path: string
+}
 class AllScreen extends Component<withRouterProps>{
     render(): React.ReactNode {
         console.log(this.props)
@@ -12,4 +15,5 @@ class AllScreen extends Component<withRouterProps>{
 
 export {AllScreen}
 
-export default withRouter(AllScreen);;
+
+export default withRouter(AllScreen);
