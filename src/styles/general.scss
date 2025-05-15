@@ -16,6 +16,10 @@ body.dark_theme {
 }
 
 #root {
+    &>* {
+        width: 100%;
+    }
+
     &>header {
         display: flex;
         justify-content: space-between;
@@ -43,6 +47,130 @@ body.dark_theme {
         h1 {
             margin: 0;
             font-size: 20px;
+        }
+    }
+}
+
+@keyframes in-bkg {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    10%{
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50%{
+        opacity: 1;
+    }
+    75%{
+        opacity: 1;
+        transform: scale(1.25);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+main {
+    max-height: calc(100% - 80px);
+    overflow: auto;
+    padding: 48px;
+
+    .countries_list {
+        display: grid;
+        gap: 72px;
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .card_element {
+        box-shadow: 0 4px 16px -16px #000;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: scale(0);
+        &[data-loaded="true"]{
+            opacity: 1;
+            animation: in-bkg 0.3s ease-in forwards;
+        }
+        // animation: in-bkg 0.5s ease-in forwards;
+
+        &.load_card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 270px;
+            background-color: $bodyCard;
+
+            .loader {
+                opacity: 0.5;
+            }
+        }
+
+        h2,
+        h3 {
+            margin: 0;
+        }
+
+        .flag {
+            position: relative;
+            display: flex;
+
+            &:before {
+                content: "";
+                position: absolute;
+                display: flex;
+                inset: 0;
+                background-color: $bodyCard;
+                $filter: brightness(0.8);
+                filter: $filter;
+            }
+
+            .flag_img.load_card {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                aspect-ratio: 3/2;
+                width: 100%;
+                height: auto;
+                align-items: center;
+                justify-content: center;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 3/2;
+                position: relative;
+            }
+        }
+
+        .info {
+            background-color: $bodyCard;
+            border-radius: 0 0 12px 12px;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: space-between;
+        }
+
+        ul {
+            list-style: none;
+            padding-inline-start: 0;
+
+            li {
+                h3 {
+                    font-size: 1em;
+                }
+
+                display: flex;
+                gap:0.25em
+            }
         }
     }
 }

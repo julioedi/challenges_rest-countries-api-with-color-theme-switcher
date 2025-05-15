@@ -3,15 +3,16 @@ import "@root/styles/general.scss";
 import { BrowserRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
 import All, { AllScreen } from '@root//screens/All';
 import Moon from './components/Moon';
+import { __ } from './utilities/Lang';
 
-const continents = ["*", "africa", "america", "asia", "europe", "oceania"];
+const continents = ["africa", "america", "asia", "europe", "oceania",""];
 class App extends Component {
   Layout = () => {
     return (
       <>
 
         <header>
-          <h1>Where in the world</h1>
+          <h1>{__("Where in the world")}</h1>
           <div
             className='theme_toggle'
             onClick={() =>{
@@ -21,7 +22,7 @@ class App extends Component {
             }}
           >
             <Moon />
-            <span>Dark mode</span>
+            <span>{__("Dark mode")}</span>
           </div>
         </header>
         <main>
@@ -30,6 +31,7 @@ class App extends Component {
       </>
     )
   }
+
   render(): ReactNode {
     const { Layout } = this;
     return (
@@ -41,6 +43,7 @@ class App extends Component {
                 <Route path={item} element={<All path={item} />} key={index} />
               ))
             }
+            <Route path={"*"} element={<All path={"*"} />}/>
           </Route>
         </Routes>
       </BrowserRouter>

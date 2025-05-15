@@ -4,9 +4,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const { url } = require('inspector');
+const webpack = require('webpack');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
-
 module.exports = {
   entry: './src/index.tsx', // Entry point for the application
   output: {
@@ -108,12 +108,15 @@ module.exports = {
           globOptions: {
             ignore: [
               '**/index.html',// Ignore index.html since it's handled by HtmlWebpackPlugin
-              '**/design' 
-            ], 
+              '**/design'
+            ],
           },
         },
       ],
     }),
     ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env),
+    }),
   ],
 };
