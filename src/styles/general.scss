@@ -98,8 +98,30 @@ main {
     overflow: auto;
     padding: 48px;
     overflow: auto;
-    scrollbar-color: $text $body;
-    scrollbar-width:thin;
+
+    /* Firefox */
+
+    /* Chrome, Edge, Safari */
+    &::-webkit-scrollbar {
+        width: 24px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $body;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $text;
+        border: 9px solid $body;
+        border-radius: 24px;
+        opacity: 0.5;
+        /* Makes the thumb blend with the track */
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none; // Removes arrows in Chrome
+    }
+
 
     .countries_list {
         display: grid;
