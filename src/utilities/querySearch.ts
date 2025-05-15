@@ -21,7 +21,10 @@ export type ParsedParams = {
 };
 
 
-function searchParams(url: string): ParsedParams {
+function searchParams(url: string|null = null): ParsedParams {
+    if (!url) {
+        url = location.search
+    }
     const search = url.includes('?') ? url.split('?')[1] : url;
     const params = new URLSearchParams(search);
     const result: ParsedParams = {};

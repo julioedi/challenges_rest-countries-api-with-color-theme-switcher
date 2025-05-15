@@ -5,7 +5,7 @@ import All, { AllScreen } from '@root//screens/All';
 import Moon from './components/Moon';
 import { __ } from './utilities/Lang';
 
-const continents = ["africa", "america", "asia", "europe", "oceania",""];
+const continents = ["africa", "america","americas", "asia", "europe", "oceania",""];
 class App extends Component {
   Layout = () => {
     return (

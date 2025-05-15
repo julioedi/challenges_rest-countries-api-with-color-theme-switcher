@@ -3,6 +3,8 @@ import { withRouter, withRouterProps } from "@root/utilities/withRouter";
 import CountryCard from "@root/components/CountryCard";
 import { api, cacheList } from "@root/utilities/countriesApi";
 import { randomIDMultiple } from "@root/utilities/randomID";
+import { __ } from "@root/utilities/Lang";
+import { searchParams } from "@root/utilities/querySearch";
 
 interface ScreenProps extends withRouterProps {
     path: string
@@ -10,21 +12,92 @@ interface ScreenProps extends withRouterProps {
 class AllScreen extends Component<ScreenProps> {
     state = {
         search: typeof this.props.query?.s == "string" ? this.props.query?.s : "",
-        continent: api.continents.includes(this.props.path) ? this.props.path : "",
+        continent: this.props.path,
         page: 1
     }
     perPage: number = typeof this.props.query?.per_page == "number" && this.props.query?.per_page > 3 ? this.props.query?.per_page : 12;
     timses = -1;
+
+
+    searchstring = "";
+    searchtypes = 0;
+    Top = () => {
+        return (
+            <div className="form_search">
+                <div className="field_element search">
+                    <input
+                        type="search"
+                        defaultValue={this.state.search}
+                        onChange={(e) => {
+                            let { value } = e.target;
+                            this.searchtypes++;
+                            let types = this.searchtypes;
+                            this.searchstring = value;
+                            setTimeout(() => {
+                                if (this.searchstring === value && types == this.searchtypes) {
+                                    this.searchtypes = 0;
+                                    const prev = searchParams();
+                                    const newParams: any = {};
+                                    for (const key in prev) {
+                                        if (Object.prototype.hasOwnProperty.call(prev, key)) {
+                                            const element = prev[key];
+                                            if (typeof element != "object") {
+                                                newParams[key] = element;
+                                            }
+                                        }
+                                    }
+                                    if (value.trim() == "") {
+                                        if ("s" in newParams) {
+                                            delete newParams.s
+                                        }
+                                    } else {
+                                        newParams["s"] = value;
+                                    }
+
+                                    this.props.setParam(newParams)
+                                    // this.setState({
+                                    //     search: value,
+                                    //     page: 1
+                                    // })
+                                }
+                            }, 500)
+
+                        }}
+                        placeholder={__("Search for a country...")}
+                    />
+                </div>
+                <div className="field_element select">
+                    <select
+                        onChange={(e) => {
+                            this.setState({
+                                continent: e.target.value,
+                                page: 1
+                            })
+                        }}
+                        defaultValue={this.state.continent == "*" ? "" : this.state.continent}
+                    >
+                        <option value="">{__("All")}</option>
+                        {
+                            api.continents.map((item, index) => (
+                                <option value={item.toLowerCase()} key={index}>{__(item)}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+            </div>
+        );
+    }
     render(): React.ReactNode {
-        const data = [...api.data];
+        const { Top } = this;
+        const data = api.filter({
+            search: this.state.search,
+            continent: this.state.continent
+        });
         const total = this.perPage * this.state.page
         data.length = total > data.length ? data.length : total;
         return (
             <>
-                <h1 onClick={() => {
-                    this.timses++;
-                    this.forceUpdate();
-                }}>Homepage</h1>
+                <Top />
                 <div className="countries_list">
                     {
                         data.map((item, index) => {

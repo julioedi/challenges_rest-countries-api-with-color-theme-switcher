@@ -67,6 +67,11 @@ class CoreCard extends Component<CountryCardProps> {
         )
     }
     container:HTMLDivElement|null = null;
+    goToCountry = () =>{
+        this.props.navigate({
+            pathname:`/country/` + this.props.item.cca3.toLowerCase()
+        })
+    }
     render() {
         const { Flag, Loader } = this;
         const { navigate, item } = this.props;
@@ -81,6 +86,9 @@ class CoreCard extends Component<CountryCardProps> {
                 data-loaded={this.state.loaded ? "true" : "false"}
                 ref={ref =>{
                     this.container = ref;
+                }}
+                onClick={() =>{
+                    this.goToCountry();
                 }}
             >
                 <div className="flag">
@@ -99,7 +107,7 @@ class CoreCard extends Component<CountryCardProps> {
                             <span>{region}</span>
                         </li>
                         {
-                            capital.length > 0 ? (
+                            capital && Array.isArray(capital) && capital.length > 0 ? (
                                 <li>
                                     <h3>{__("Capital")}:</h3>
                                     <div className="capitals">

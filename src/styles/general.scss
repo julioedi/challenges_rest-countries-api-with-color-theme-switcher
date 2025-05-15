@@ -56,17 +56,21 @@ body.dark_theme {
         opacity: 0;
         transform: scale(0.5);
     }
-    10%{
+
+    10% {
         opacity: 0;
         transform: scale(0.5);
     }
-    50%{
+
+    50% {
         opacity: 1;
     }
-    75%{
+
+    75% {
         opacity: 1;
         transform: scale(1.25);
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -93,10 +97,12 @@ main {
         flex-direction: column;
         opacity: 0;
         transform: scale(0);
-        &[data-loaded="true"]{
+
+        &[data-loaded="true"] {
             opacity: 1;
             animation: in-bkg 0.3s ease-in forwards;
         }
+
         // animation: in-bkg 0.5s ease-in forwards;
 
         &.load_card {
@@ -145,6 +151,7 @@ main {
                 width: 100%;
                 height: auto;
                 aspect-ratio: 3/2;
+                object-fit: contain;
                 position: relative;
             }
         }
@@ -171,6 +178,77 @@ main {
                 display: flex;
                 gap:0.25em
             }
+        }
+    }
+}
+.form_search{
+    padding-bottom: 48px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    :focus,:active:focus-visible{
+        outline: none;
+        border:none;
+    }
+    input,select{
+        width: 100%;
+        padding: 0 24px;
+        height:56px;
+        outline: none;
+        border:none;
+        background-color: $bodyCard;
+        color:inherit;
+        font:inherit;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    &>div{
+        display: flex;
+        width: 100%;
+        position: relative;
+        box-shadow: 0 4px 16px  rgba(0, 0, 0, 0.06);
+    }
+    .search{
+        max-width: 480px;
+    }
+    .select{
+        max-width: 200px;
+        display: flex;
+    }
+}
+
+@media (max-width:$large_desktop) {
+    main {
+        .countries_list {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+}
+
+@media (max-width:$medium_desktop) {
+    main {
+        .countries_list {
+            gap: 48px;
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+}
+
+@media (max-width:$tablet_break) {
+    main {
+        .countries_list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media (max-width:$mobile_break) {
+    main {
+        padding: 24px;
+
+        .countries_list {
+            gap: 24px;
+            grid-template-columns: 1fr;
         }
     }
 }

@@ -128,7 +128,6 @@ class coreApi {
             window.localStorage.setItem("countries", JSON.stringify(elements));
             this.lastUpdate = date; // Optional: set this for immediate use
             this.processData();
-            // console.log("less than a month");
         }
     }
 
@@ -157,16 +156,16 @@ class coreApi {
         }
         await this.setData()
     }
-    continents = ["Africa", "America", "Asia", "Europe", "Oceania", "Antarctic"];
+    continents = ["Africa", "America","Asia", "Europe", "Oceania", "Antarctic"];
     filter(data: filterfields = {}): CountryItem[] {
         if (!this.data) {
             return [];
         }
-        let preData = this.data;
         data.search = data?.search ? data.search.trim() : "";
         data.continent = data?.continent ? data.continent.trim() : "";
 
-
+        const continent = data.continent != "" &&  data.continent !== "*";
+        const reg = continent ? new RegExp(data.continent,"i") : /^_none$/i;
         const result = [...this.data].filter(item => {
             if (data.search && data.search != "" && data.search.length > 1) {
                 const namereg = new RegExp(data.search, "i");
@@ -179,7 +178,7 @@ class coreApi {
                     return false;
                 }
             }
-            if (data.continent && !this.continents.includes(data.continent)) {
+            if (continent && !reg.test(item.region)) {
                 return false;
             }
             return true;
@@ -193,7 +192,6 @@ class coreApi {
         //     if (nameA > nameB) return 1;
         //     return 0;
         // });
-
         return result;
     }
 }
