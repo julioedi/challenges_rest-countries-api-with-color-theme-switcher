@@ -1,7 +1,7 @@
 @use "vars" as *;
 @use "colors" as *;
 
-body.dark_theme {
+html.dark_theme {
     #root>header {
         svg {
             .filled {
@@ -13,6 +13,21 @@ body.dark_theme {
             }
         }
     }
+
+    main {
+        .card_element {
+
+            .flag:before {
+                $filter: brightness(0.66);
+                filter: $filter;
+            }
+        }
+    }
+
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
 }
 
 #root {
@@ -181,37 +196,52 @@ main {
         }
     }
 }
-.form_search{
+
+.form_search {
     padding-bottom: 48px;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    :focus,:active:focus-visible{
+    gap: 48px;
+
+    :focus,
+    :active:focus-visible {
         outline: none;
-        border:none;
+        border: none;
     }
-    input,select{
+
+    input,
+    select {
         width: 100%;
         padding: 0 24px;
-        height:56px;
+        height: 56px;
         outline: none;
-        border:none;
+        border: none;
         background-color: $bodyCard;
-        color:inherit;
-        font:inherit;
+        color: inherit;
+        font: inherit;
         appearance: none;
         -webkit-appearance: none;
+
+        &::placeholder {
+            font: inherit;
+            color: inherit;
+            opacity: 0.5;
+        }
     }
-    &>div{
+
+    &>div {
         display: flex;
         width: 100%;
         position: relative;
-        box-shadow: 0 4px 16px  rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
-    .search{
+
+    .search {
         max-width: 480px;
     }
-    .select{
+
+    .select {
         max-width: 200px;
         display: flex;
     }
@@ -239,12 +269,39 @@ main {
         .countries_list {
             grid-template-columns: repeat(2, 1fr);
         }
+
+        .form_search {
+
+            gap: 24px;
+
+            .select {
+                flex: 2;
+            }
+
+            .search {
+                flex: 1;
+            }
+        }
     }
 }
 
-@media (max-width:$mobile_break) {
+@media (max-width: $mobile_break) {
+    #root>header h1 {
+        font-size: 16px;
+    }
+
     main {
         padding: 24px;
+
+        .form_search {
+
+            .select,
+            .search {
+                flex: unset;
+
+                max-width: 100%;
+            }
+        }
 
         .countries_list {
             gap: 24px;
