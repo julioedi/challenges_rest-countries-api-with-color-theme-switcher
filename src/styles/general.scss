@@ -16,7 +16,7 @@ html.dark_theme {
 
     main {
         .card_element {
-
+            box-shadow: 0 16px 12px  rgba(0, 0, 0, 0.12);
             .flag:before {
                 $filter: brightness(0.66);
                 filter: $filter;
