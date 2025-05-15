@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dotenv environment files
+.env
+.env.*.local
+
+# MacOS
+.DS_Store
+
+# VSCode settings
+.vscode/
+
+# TypeScript
+*.tsbuildinfo
+
+# Webpack cache (if using webpack 5 persistent caching)
+.cache/

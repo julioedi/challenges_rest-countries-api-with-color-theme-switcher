@@ -1,0 +1,31 @@
+@use "vars" as *;
+@use "colors" as *;
+
+:root {
+    --body: #FFFFFF;
+    --bodyCard: #F5F5F5;
+    --text: #121212;
+    --textHalf: #828282;
+}
+
+body.dark_theme {
+    --body: #212E37;
+    --bodyCard: #2B3743;
+    --text: #FFFFFF;
+    --textHalf: #DCE5EC;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Nunito Sans", sans-serif;
+    font-optical-sizing: auto;
+    color: $text;
+    background: $body;
+}
+
+#root {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}

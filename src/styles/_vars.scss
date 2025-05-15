@@ -1,0 +1,59 @@
+$transition: 0.3s ease all;
+
+@mixin user-select-none {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none; // -ms- is more correct than -o- for old IE
+}
+
+@mixin no-auto-fill {
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active,
+    &:-internal-autofill-selected {
+        background-color: transparent !important;
+        border: 1px solid transparent;
+        -webkit-text-fill-color: inherit !important;
+        -webkit-box-shadow: 0 0 0px 1000px #00000001 inset;
+        transition: background-color 5000s ease-in-out 0s;
+        -webkit-text-fill-color: inherit !important;
+    }
+}
+
+@mixin no_list {
+    list-style: none;
+    padding-inline-start: 0;
+    margin-inline-start: 0;
+}
+
+
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-items: center;
+}
+
+@mixin list-center {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin focus-card {
+
+    &:focus,
+    &:active,
+    &:focus-visible {
+        border-color: var(--border_primary);
+        outline: none;
+        background-color: var(--form_card);
+        box-shadow: 0 6px 24px -16px var(--primary);
+    }
+}
+$tablet_break: 920px;
+$mobile_break: 640px;
+$mobile_small_break: 380px;
