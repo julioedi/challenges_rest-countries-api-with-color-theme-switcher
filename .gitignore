@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # Webpack cache (if using webpack 5 persistent caching)
 .cache/
+
+#ingnore sample jsons
