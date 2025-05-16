@@ -1,28 +1,34 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const { url } = require('inspector');
 const webpack = require('webpack');
 const dotenv = require('dotenv');
 
 // Load environment variables from .env file
-const env = dotenv.config().parsed;
+const env = dotenv.config().parsed || {};
 
-// Convert environment variables to `DefinePlugin` format
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next]);
-  return prev;
-}, {});
+// Extract NODE_ENV early for usage
+const nodeEnv = process.env.NODE_ENV || 'development';
+const isDevelopment = nodeEnv !== 'production';
 
-const isDevelopment = env.NODE_ENV !== 'production';
+// Convert environment variables to `DefinePlugin` format, excluding NODE_ENV to avoid conflict
+const envKeys = Object.keys(env)
+  .filter(key => key !== 'NODE_ENV')
+  .reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+    return prev;
+  }, {});
+
+// Also explicitly define NODE_ENV for use in the app
+envKeys['process.env.NODE_ENV'] = JSON.stringify(nodeEnv);
 
 let output = {
   filename: 'bundle.js',
   path: path.resolve(__dirname, 'dist'),
-  clean: true, // Clean the dist folder before each build
-}
+  clean: true,
+};
 
 let template = {
   templateParameters: {
@@ -30,19 +36,58 @@ let template = {
     version: process.env.VERSION ?? "1.0",
   }
 };
-if (process.env.RELATIVE_PATH && !isDevelopment) {
-  output["publicPath"] = process.env.RELATIVE_PATH;
-}else{
-  output["publicPath"] = "/";
+
+output["publicPath"] = (!isDevelopment && process.env.RELATIVE_PATH) ? process.env.RELATIVE_PATH : "/";
+console.log('isDevelopment:', isDevelopment);  // Add this to debug
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
+
+
+const plugins = [
+  new CleanWebpackPlugin(),
+  new HtmlWebpackPlugin({
+    template: './public/index.html',
+    filename: 'index.html',
+    minify: {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeRedundantAttributes: true,
+      useShortDoctype: true,
+      removeEmptyAttributes: true,
+      minifyCSS: true,
+      minifyJS: true,
+    },
+    ...template,
+  }),
+  new CopyWebpackPlugin({
+    patterns: [
+      {
+        from: path.resolve(__dirname, 'public'),
+        to: path.resolve(__dirname, 'dist'),
+        globOptions: {
+          ignore: [
+            '**/index.html',
+            '**/design'
+          ],
+        },
+      },
+    ],
+  }),
+  // ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
+  new webpack.DefinePlugin(envKeys),
+];
+
+if (isDevelopment) {
+  plugins.push(new ReactRefreshWebpackPlugin());
 }
 
 module.exports = {
-  entry: './src/index.tsx', // Entry point for the application
+  mode: nodeEnv, // Explicitly set mode
+  entry: './src/index.tsx',
   output,
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.scss'], // Resolve file extensions for TypeScript and SCSS
+    extensions: ['.ts', '.tsx', '.js', '.scss'],
     alias: {
-      '@root/*': path.resolve(__dirname, 'src/*'),  // Alias "@" to the "src" folder (generic for all folders inside src)
+      '@root/*': path.resolve(__dirname, 'src/*'),
     },
   },
   module: {
@@ -53,46 +98,40 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name].[hash].[ext]',    // Keeps the original filename with a hash
-              outputPath: 'assets/img/',      // Files are placed in 'dist/assets/img/'
-              publicPath: '/assets/img/',     // Correct URL path for serving images
-            },
-          },
-        ],
-      },
-      // {
-      //   test: /\.tsx?$/, // Look for .ts or .tsx files
-      //   use: 'ts-loader', // Use ts-loader to handle TypeScript files
-      //   exclude: /node_modules/,
-      // },
-      {
-        test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                '@babel/preset-env',
-                '@babel/preset-react',
-                '@babel/preset-typescript',
-              ],
-              plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
+              name: '[name].[hash].[ext]',
+              outputPath: 'assets/img/',
+              publicPath: '/assets/img/',
             },
           },
         ],
       },
       {
-        test: /\.scss$/, // Look for .scss files
+      test: /\.(ts|tsx)$/,
+      exclude: /node_modules/,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-react',
+              '@babel/preset-typescript',
+            ],
+            // Only apply React Refresh plugin when in development mode
+            plugins: isDevelopment ? [require.resolve('react-refresh/babel')] : [],
+          },
+        },
+      ],
+    },,
+      {
+        test: /\.scss$/,
         use: [
-          'style-loader', // Inject CSS into the DOM
+          'style-loader',
           {
             loader: 'css-loader',
-            options: {
-              url: false,
-            }
-          }, // Resolve @import and url() in CSS files
-          'sass-loader', // Compile SASS/SCSS to CSS
+            options: { url: false },
+          },
+          'sass-loader',
         ],
       },
       {
@@ -101,55 +140,22 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: 'assets/fonts/[name].[hash].[ext]', // Fonts will be copied to dist/assets/fonts/
+              name: 'assets/fonts/[name].[hash].[ext]',
             },
           },
         ],
       },
     ],
   },
-  devtool: 'source-map', // Generate source maps for better debugging
+  devtool: 'source-map',
   devServer: {
-    // static: './public', // Serve files from the 'dist' directory
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    hot: true, // Enable hot module replacement (HMR) for live updates
-    open: true, // Automatically open the browser on server start
-    port: 3000, // Use port 3000 for the development server
-    historyApiFallback: true,  // Ensure React Router handles all routes
+    hot: true,
+    open: true,
+    port: 3000,
+    historyApiFallback: true,
   },
-  plugins: [
-    new CleanWebpackPlugin(), // Clean up the dist folder before each build
-    new HtmlWebpackPlugin({
-      template: './public/index.html', // Use the index.html file as a template
-      filename: 'index.html', // Output the file to dist/index.html
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        minifyCSS: true,
-        minifyJS: true,
-      },
-      ...template
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, 'public'), // Copy everything from public
-          to: path.resolve(__dirname, 'dist'), // To the dist folder
-          globOptions: {
-            ignore: [
-              '**/index.html',// Ignore index.html since it's handled by HtmlWebpackPlugin
-              '**/design'
-            ],
-          },
-        },
-      ],
-    }),
-    ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
-    new webpack.DefinePlugin(envKeys),
-  ],
+  plugins: plugins.filter(Boolean),
 };
