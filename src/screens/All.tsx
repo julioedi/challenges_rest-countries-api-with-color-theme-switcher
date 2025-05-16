@@ -5,6 +5,9 @@ import { api, cacheList } from "@root/utilities/countriesApi";
 import { randomIDMultiple } from "@root/utilities/randomID";
 import { __ } from "@root/utilities/Lang";
 import { searchParams } from "@root/utilities/querySearch";
+import Search from "@root/components/Search";
+import Close from "@root/components/Close";
+import ExpandMore from "@root/components/ExpandMore";
 
 interface ScreenProps extends withRouterProps {
     path: string
@@ -25,6 +28,7 @@ class AllScreen extends Component<ScreenProps> {
         return (
             <div className="form_search">
                 <div className="field_element search">
+                    <Search />
                     <input
                         type="search"
                         defaultValue={this.state.search}
@@ -54,7 +58,10 @@ class AllScreen extends Component<ScreenProps> {
                                         newParams["s"] = value;
                                     }
 
-                                    this.props.setParam(newParams)
+                                    this.props.setParam(newParams);
+                                    this.setState({
+                                        search: value
+                                    })
                                     // this.setState({
                                     //     search: value,
                                     //     page: 1
@@ -65,14 +72,15 @@ class AllScreen extends Component<ScreenProps> {
                         }}
                         placeholder={__("Search for a country...")}
                     />
+                    <Close />
                 </div>
                 <div className="field_element select">
                     <select
                         onChange={(e) => {
-                            this.setState({
-                                continent: e.target.value,
-                                page: 1
-                            })
+                            const id = e.target.value;
+                            if (id !== this.state.continent) {
+                                this.props.navigate(`/${e.target.value}` + window.location.search);
+                            }
                         }}
                         defaultValue={this.state.continent == "*" ? "" : this.state.continent}
                     >
@@ -83,18 +91,20 @@ class AllScreen extends Component<ScreenProps> {
                             ))
                         }
                     </select>
+                    <ExpandMore />
                 </div>
             </div>
         );
     }
+
     render(): React.ReactNode {
         const { Top } = this;
         const data = api.filter({
             search: this.state.search,
             continent: this.state.continent
         });
-        const total = this.perPage * this.state.page
-        data.length = total > data.length ? data.length : total;
+        // const total = this.perPage * this.state.page
+        // data.length = total > data.length ? data.length : total;
         return (
             <>
                 <Top />
@@ -105,7 +115,7 @@ class AllScreen extends Component<ScreenProps> {
                             const loaded = cacheList.check(flag);
                             const tempID = randomIDMultiple();
                             return (
-                                <CountryCard item={item} key={tempID} flag={flag} loaded={loaded} />
+                                <CountryCard item={item} key={tempID} flag={flag} loaded={loaded} current={this.state.continent} />
                             )
                         })
                     }

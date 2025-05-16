@@ -5,15 +5,40 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const { url } = require('inspector');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+// Load environment variables from .env file
+const env = dotenv.config().parsed;
+
+// Convert environment variables to `DefinePlugin` format
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
+
+const isDevelopment = env.NODE_ENV !== 'production';
+
+let output = {
+  filename: 'bundle.js',
+  path: path.resolve(__dirname, 'dist'),
+  clean: true, // Clean the dist folder before each build
+}
+
+let template = {
+  templateParameters: {
+    publicPath: !isDevelopment && process.env.RELATIVE_PATH ? process.env.RELATIVE_PATH : "/",
+    version: process.env.VERSION ?? "1.0",
+  }
+};
+if (process.env.RELATIVE_PATH && !isDevelopment) {
+  output["publicPath"] = process.env.RELATIVE_PATH;
+}else{
+  output["publicPath"] = "/";
+}
+
 module.exports = {
   entry: './src/index.tsx', // Entry point for the application
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-    clean: true, // Clean the dist folder before each build
-  },
+  output,
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.scss'], // Resolve file extensions for TypeScript and SCSS
     alias: {
@@ -99,6 +124,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html', // Use the index.html file as a template
       filename: 'index.html', // Output the file to dist/index.html
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        minifyCSS: true,
+        minifyJS: true,
+      },
+      ...template
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -115,8 +150,6 @@ module.exports = {
       ],
     }),
     ...(isDevelopment ? [new ReactRefreshWebpackPlugin()] : []),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(process.env),
-    }),
+    new webpack.DefinePlugin(envKeys),
   ],
 };

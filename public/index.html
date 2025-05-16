@@ -7,6 +7,8 @@
     if (dark) {
       document.head.parentNode.classList.add("dark_theme")
     }
+    window.publicPath = "<%= publicPath %>";
+    window.version = "<%= version %>";
   </script>
   <style>
     :root {
@@ -77,6 +79,9 @@
       align-items: center;
       justify-content: center;
     }
+    #root>.loader{
+      width: 1em;
+    }
 
     #root>main {
       flex: 1;
@@ -97,7 +102,7 @@
     href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
     rel="stylesheet">
   <title>Launch Countdown Timer</title>
-  <link rel="shortcut icon" href="./assets/images/favicon-32x32.png" type="image/x-icon">
+  <link rel="shortcut icon" href="<%= publicPath %>assets/images/favicon-32x32.png" type="image/x-icon">
 </head>
 
 <body>

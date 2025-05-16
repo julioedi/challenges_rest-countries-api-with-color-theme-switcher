@@ -1,13 +1,18 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "es6"],
+    "lib": [
+      "dom",
+      "es6"
+    ],
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@root/*": ["src/*"]
+      "@root/*": [
+        "src/*"
+      ]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,6 +20,9 @@
     "skipLibCheck": true,
     "downlevelIteration": true
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "/assets/img",
     "assets/img"

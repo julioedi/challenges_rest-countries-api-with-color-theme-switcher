@@ -25,6 +25,10 @@ html.dark_theme {
         }
     }
 
+    .btn {
+        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.24);
+    }
+
 }
 
 * {
@@ -45,6 +49,7 @@ html.dark_theme {
         background-color: $bodyCard;
         box-shadow: 0 -36px 36px 36px rgba(0, 0, 0, 0.12);
         transition: $transition;
+        z-index: 999;
 
         .theme_toggle {
             @include user-select-none;
@@ -93,11 +98,40 @@ html.dark_theme {
     }
 }
 
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 32px;
+    gap: 12px;
+    background-color: $bodyCard;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    @include user-select-none;
+    &.small{
+        padding:8px 24px;
+    }
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+$inBkg: in-bkg 0.3s ease-in forwards;
+
 main {
     max-height: calc(100% - 80px);
     overflow: auto;
     padding: 48px;
-    overflow: auto;
+    overflow: overlay;
+    position: relative;
+    &>* {
+        transition: $transition;
+
+        &.hide {
+            opacity: 0;
+        }
+    }
 
     /* Firefox */
 
@@ -107,14 +141,20 @@ main {
     }
 
     &::-webkit-scrollbar-track {
-        background: $body;
+        background: #00000001;
+        transition: $transition;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: $text;
-        border: 9px solid $body;
+        //using #hex alsmost transparent for background color since dont accepts rgba;
+        background-color: #00000001;
+        //add the border, so the inner shadow simulates a fill
+        border: 9px solid #00000001;
+        transition: $transition;
+        box-shadow: 0 0 0 4px $text inset;
         border-radius: 24px;
         opacity: 0.5;
+        transition: $transition;
         /* Makes the thumb blend with the track */
     }
 
@@ -141,7 +181,7 @@ main {
 
         &[data-loaded="true"] {
             opacity: 1;
-            animation: in-bkg 0.3s ease-in forwards;
+            animation: $inBkg;
         }
 
         // animation: in-bkg 0.5s ease-in forwards;
@@ -163,9 +203,14 @@ main {
             margin: 0;
         }
 
+        h2 {
+            cursor: pointer;
+        }
+
         .flag {
             position: relative;
             display: flex;
+            cursor: pointer;
 
             &:before {
                 content: "";
@@ -210,6 +255,10 @@ main {
         ul {
             list-style: none;
             padding-inline-start: 0;
+
+            .region:not(.current) {
+                cursor: pointer;
+            }
 
             li {
                 h3 {
@@ -265,11 +314,147 @@ main {
 
     .search {
         max-width: 480px;
+        position: relative;
+        svg{
+            position: absolute;
+            top:16px;
+            left:16px;
+            pointer-events: none;
+            &.close{
+                left:unset;
+                right:16px;
+            }
+        }
+        input{
+            padding-left: 48px;
+            padding-right:0;
+        }
+        .close{
+            opacity: 0;
+            transition: $transition;
+        }
+        input[type="search" i]::-webkit-search-cancel-button {
+            opacity: 0;
+            padding:14px;
+        }
+        
+        input:not(:placeholder-shown):is(:focus,:active) ~ .close {
+            opacity: 1;
+        }
+        input:placeholder-shown ~ .close {
+            opacity: 0;
+        }
     }
 
     .select {
         max-width: 200px;
         display: flex;
+        position: relative;
+        select{
+            padding-right: 48px;
+            &:open ~ svg{
+                transform: rotate(180deg);
+            }
+        }
+        svg{
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            pointer-events: none;
+            transition: $transition;
+            transform-origin: center;
+        }
+        
+    }
+}
+
+.single_top {
+    position: sticky;
+    top:0;
+    z-index: 999;
+}
+
+.single_country {
+    padding-top: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 72px;
+    align-items: center;
+
+    .flag {
+        display: flex;
+        max-width: 600px;
+        flex: 1;
+
+        img {
+            transition: $transition;
+            opacity: 0;
+            width: 100%;
+            height: auto;
+
+            &.loaded {
+                opacity: 1;
+                animation: $inBkg;
+            }
+        }
+    }
+    .borders{
+        display: flex;
+        gap:12px;
+        h3{
+            padding-top: 8px;
+        }
+        .list{
+            display: flex;
+            gap:12px;
+            flex-wrap: wrap;
+        }
+    }
+    .info {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 24px;
+        row-gap: 48px;
+        min-height: 100%;
+
+        h2,
+        h3 {
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 24px;
+            width: 100%;
+        }
+
+        h3 {
+            display: flex;
+            font-size: 1em;
+            margin-right: 0.5em;
+        }
+
+        ul {
+            @include no_list;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            width: calc(50% - 12px);
+            margin:0;
+            li {
+                font-size: 1rem;
+                width: 100%;
+                display: flex;
+
+                .capitals {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                width: 100%;
+            }
+        }
     }
 }
 
@@ -288,10 +473,41 @@ main {
             grid-template-columns: repeat(3, 1fr);
         }
     }
+    .single_country{
+        align-content: flex-start;
+        align-items: flex-start;
+        .info{
+            ul{
+                width: 100%;
+            }
+        }
+    }
 }
 
 @media (max-width:$tablet_break) {
     main {
+        .single_country{
+            flex-direction: column;
+            .flag{
+                max-width: 100%;
+                width: 100%;
+                img{
+                    width: 100%;
+                    height: auto;
+                }
+            }
+            .info{
+                h2{
+                font-size: 32px;
+                }
+            }
+            &>div{
+                width: 100%;
+            }
+            .borders{
+                flex-direction: column;
+            }
+        }
         .countries_list {
             grid-template-columns: repeat(2, 1fr);
         }

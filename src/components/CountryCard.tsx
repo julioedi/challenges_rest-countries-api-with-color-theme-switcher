@@ -1,16 +1,19 @@
 import React, { Component } from "react";
-import { CountryItem } from "@root/utilities/countriesApi";
+import { api, CountryItem } from "@root/utilities/countriesApi";
 import { withRouterProps, withRouter } from "@root/utilities/withRouter";
 import { randomIDMultiple } from "@root/utilities/randomID";
 import waitUntilVisible from "@root/utilities/waitUntilVisible";
 import { loadImages } from "@root/utilities/countriesApi";
 import { __ } from "@root/utilities/Lang";
 import { cacheList } from "@root/utilities/countriesApi";
+import { wait } from "@root/utilities/wait";
+
 
 interface CountryCardProps extends withRouterProps {
     item: CountryItem,
-    loaded:boolean,
-    flag:string,
+    loaded: boolean,
+    flag: string,
+    current?:string
 }
 
 interface FlagProps {
@@ -36,18 +39,18 @@ class CoreCard extends Component<CountryCardProps> {
         const { alt } = this.props.item.flags;
         return (
             <img
-                src={flag + "?v=" + (process.env?.version ?? "0") }
+                src={flag + "?v=" /***+ ((process && process?.env?.version) ?? "0")  */}
                 loading="lazy"
                 width={180}
                 height={120}
                 alt={alt && !bkg ? __(alt) : ""}
                 className={"flag_img" + (bkg ? " bkg" : "")}
-                onLoad={(e) =>{
+                onLoad={(e) => {
                     if (this.container) {
-                        this.container.setAttribute("data-loaded","true");
+                        this.container.setAttribute("data-loaded", "true");
                         return;
                     }
-                    e.currentTarget.closest("card_element")?.setAttribute("data-loaded","true");
+                    e.currentTarget.closest("card_element")?.setAttribute("data-loaded", "true");
                 }}
             />
         )
@@ -66,12 +69,44 @@ class CoreCard extends Component<CountryCardProps> {
             </>
         )
     }
-    container:HTMLDivElement|null = null;
-    goToCountry = () =>{
+    container: HTMLDivElement | null = null;
+    goToCountry = async () => {
+
+        const formSearch = document.querySelector(".form_search") as HTMLDivElement | null;
+        const countries_list = document.querySelector(".countries_list") as HTMLDivElement | null;
+
+        formSearch?.classList.add("hide");
+        countries_list?.classList.add("hide");
+
+        await wait(0.3);
         this.props.navigate({
-            pathname:`/country/` + this.props.item.cca3.toLowerCase()
+            pathname: `/country/` + this.props.item.cca3.toLowerCase()
         })
     }
+
+    processRegion = () => {
+        return (this.props.current ?? "").length > 2;
+    }
+
+    goToRegion = () => {
+        for (let i = 0; i < api.continents.length; i++) {
+            const region = api.continents[i].toLowerCase()
+            const element = new RegExp(region, "i");
+            if (element.test(this.props.item.region)) {
+                if (!element.test(this.props.location.pathname)) {
+                    this.props.navigate({
+                        pathname: `/` + region
+                    });
+                }
+                return;
+            }
+        }
+        this.props.navigate({
+            pathname: `/` + this.props.item.region.replace(/[^a-z]/i, "_").replace(/\-+/, "-").toLowerCase()
+        })
+
+    }
+
     render() {
         const { Flag, Loader } = this;
         const { navigate, item } = this.props;
@@ -79,30 +114,31 @@ class CoreCard extends Component<CountryCardProps> {
         // if (this.state.flag == "" || this.state.loaded < 1) {
         //     return null
         // }
+        const current = this.processRegion();
         return (
             <div
                 className="card_element"
                 key={this.tempID}
                 data-loaded={this.state.loaded ? "true" : "false"}
-                ref={ref =>{
+                ref={ref => {
                     this.container = ref;
                 }}
-                onClick={() =>{
-                    this.goToCountry();
-                }}
             >
-                <div className="flag">
+                <div
+                    className="flag"
+                    onClick={this.goToCountry}
+                >
                     <Flag />
 
                 </div>
                 <div className="info">
-                    <h2>{name.official}</h2>
+                    <h2 onClick={this.goToCountry}>{name.common}</h2>
                     <ul>
                         <li>
-                            <h3>{__("Population")}:</h3>
+                            <h3 >{__("Population")}:</h3>
                             <span>{population.toLocaleString()}</span>
                         </li>
-                        <li>
+                        <li className={"region" + (current ? " current" : "")} onClick={current ? undefined :this.goToRegion}>
                             <h3>{__("Region")}:</h3>
                             <span>{region}</span>
                         </li>
