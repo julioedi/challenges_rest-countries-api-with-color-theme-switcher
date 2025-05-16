@@ -6,3 +6,4 @@ const wait = async (time:number = 0.3) => {
     }, time * 1000)
   })
 }
+export {wait}

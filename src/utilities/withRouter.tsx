@@ -1,19 +1,22 @@
-import React,{ComponentClass, FunctionComponent, JSXElementConstructor, ReactNode,PropsWithChildren } from "react";
+import React,{JSXElementConstructor, ReactNode,PropsWithChildren, Component, ComponentType } from "react";
 import {
   Params,
+  SetURLSearchParams,
   useLocation,
   useNavigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 import { Location, NavigateFunction } from "react-router-dom";
 import { ParsedParams, searchParams } from "@root/utilities/querySearch";
 
 export type routeParams = Readonly<Params<string>>;
-export declare interface withRouterProps extends ComponentClass{
+export declare interface withRouterProps{
   location:Location,
   navigate: NavigateFunction,
   params: routeParams
   query: ParsedParams
+  setParam: SetURLSearchParams
 }
 
 
@@ -22,6 +25,8 @@ function withRouter(Item:JSXElementConstructor<any>) {
     let location = useLocation();
     let navigate = useNavigate();
     let params = useParams();
+    let searchParamsList = useSearchParams();
+    let [paramsList,setParam] = searchParamsList;
     let query = searchParams(location?.search || "");
     return (
       <Item
@@ -30,6 +35,7 @@ function withRouter(Item:JSXElementConstructor<any>) {
         navigate={navigate}
         params={params}
         query={query}
+        setParam={setParam}
       />
     );
   }

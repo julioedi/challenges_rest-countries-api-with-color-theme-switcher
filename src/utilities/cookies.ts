@@ -25,6 +25,9 @@ function parseCookies(): ParsedCookieParams {
   return result;
 }
 
+const defaultCookies = parseCookies();
+export {defaultCookies}
+
 export {parseCookies};
 
 // Try to parse a value as JSON if possible
@@ -35,6 +38,8 @@ function tryParseJSON(value: string): any {
     return undefined;  // Return undefined if not valid JSON
   }
 }
+
+export {tryParseJSON}
 
 interface cookieCurrent {
   [key: string | number]: any;

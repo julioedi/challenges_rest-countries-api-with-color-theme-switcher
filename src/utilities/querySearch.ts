@@ -1,30 +1,41 @@
 
 function coerceType(value: string): any {
-  const trimmed = value.trim();
+    const trimmed = value.trim();
 
-  if (/^true$/i.test(trimmed)) return true;
-  if (/^false$/i.test(trimmed)) return false;
-  if (/^null$/i.test(trimmed)) return null;
-  if (/^undefined$/i.test(trimmed)) return undefined;
-  if (!isNaN(Number(trimmed)) && trimmed !== '') return Number(trimmed);
+    if (/^true$/i.test(trimmed)) return true;
+    if (/^false$/i.test(trimmed)) return false;
+    if (/^null$/i.test(trimmed)) return null;
+    if (/^undefined$/i.test(trimmed)) return undefined;
+    if (!isNaN(Number(trimmed)) && trimmed !== '') return Number(trimmed);
 
-  return decodeURIComponent(trimmed);
+    return decodeURIComponent(trimmed);
 }
 
-export {coerceType};
+export { coerceType };
+// types/ParsedQueryParams.ts
 
-function searchParams<T = Record<string, any>>(url: string): T {
+export type ParsedValue = string | number | boolean | null | undefined;
+
+export type ParsedParams = {
+    [key: string]: ParsedValue | ParsedParams | ParsedValue[] | ParsedParams[];
+};
+
+
+function searchParams(url: string|null = null): ParsedParams {
+    if (!url) {
+        url = location.search
+    }
     const search = url.includes('?') ? url.split('?')[1] : url;
     const params = new URLSearchParams(search);
-    const result: Record<string, any> = {};
+    const result: ParsedParams = {};
 
-    for (const [key, value] of params.entries()) {
+    params.forEach((value, key) => {
         assignNestedParam(result, key, coerceType(value));
-    }
+    });
 
-    return result as T;
+    return result;
 }
-export {searchParams}
+export { searchParams }
 
 function assignNestedParam(obj: any, key: string, value: any): void {
     const path: (string | number)[] = [];
@@ -67,4 +78,4 @@ function assignNestedParam(obj: any, key: string, value: any): void {
         }
     }
 }
-export {assignNestedParam}
+export { assignNestedParam }
